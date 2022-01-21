@@ -15,15 +15,14 @@ def check_if_word_is_possable(word, set_letters, wild_letters, bad_letters):
 		letter = word[letter_pos]
 		if letter in bad_letters:
 			return False
-		if letter in set_letters.values() or letter in wild_letters.keys():
-			if letter_pos in set_letters.keys() and letter != set_letters[letter_pos]:
+		elif letter_pos in set_letters.keys() and letter != set_letters[letter_pos]:
 				return False
-			else:
-				for letter_pos_tmp in wild_letters[letter]:
-					if letter_pos == letter_pos_tmp:
-						return False
-				else:
-					unknown_letters -= 1
+		elif letter in wild_letters.keys():
+			for letter_pos_tmp in wild_letters[letter]:
+				if letter_pos == letter_pos_tmp:
+					return False
+				# else:
+				# 	unknown_letters -= 1
 		else:
 			unknown_letters -= 1
 			if unknown_letters < 0:
