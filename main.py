@@ -1,7 +1,4 @@
-from copy import copy
 import json
-import os
-import copy
 
 def check_if_word_is_possable(word, set_letters, wild_letters, bad_letters):
 	# Get the number of unique letters in wild_letters dict
