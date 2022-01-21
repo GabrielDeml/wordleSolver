@@ -3,8 +3,9 @@ import json
 import os
 import copy
 
-def check_if_word_is_possable(word, wild_letters, set_letters, bad_letters):
-	unknown_letters = len(word) - len(wild_letters) - len(set_letters)
+def check_if_word_is_possable(word, set_letters, wild_letters, bad_letters):
+	# Get the number of unique letters in wild_letters dict
+	unknown_letters = len(word) - len(set(wild_letters.values())) - len(set_letters)
 	wild_letters = copy.deepcopy(wild_letters)
 	set_letters = copy.deepcopy(set_letters)
 
@@ -13,15 +14,18 @@ def check_if_word_is_possable(word, wild_letters, set_letters, bad_letters):
 		letter = word[letter_pos]
 		if letter in bad_letters:
 			return False
-		if letter_pos in set_letters:
-			if letter != set_letters[letter_pos]:
+		if letter_pos in set_letters.values() or letter in wild_letters.values():
+			if letter_pos in set_letters and letter != set_letters[letter_pos]:
 				return False
-		elif letter in wild_letters.values():
+		
 			if letter_pos in wild_letters:
 				if wild_letters[letter_pos] == letter:
 					return False
-				else:
-					wild_letters.pop(letter_pos)
+			else:
+				# Get key of the letter
+				for key in wild_letters.keys():
+					if wild_letters[key] == letter:
+						wild_letters[key] == "*"
 		else:
 			unknown_letters -= 1
 			if unknown_letters < 0:
@@ -29,12 +33,12 @@ def check_if_word_is_possable(word, wild_letters, set_letters, bad_letters):
 	return True
 		
 
-def find_best_choice(letters_in_position, words, wild_letters, set_letters, bad_letters):
+def find_best_choice(letters_in_position, words, set_letters, wild_letters, bad_letters):
 	max_score = 0 
 	max_word = ''
 
 	for word in words:
-		if check_if_word_is_possable(word, wild_letters, set_letters, bad_letters):
+		if check_if_word_is_possable(word, set_letters, wild_letters, bad_letters):
 			score = 0
 			for letter_pos in range(len(word)):
 				letter = word[letter_pos]
@@ -44,19 +48,28 @@ def find_best_choice(letters_in_position, words, wild_letters, set_letters, bad_
 				max_word = word
 	return max_word
 
-def parse_results(user_input, tried_word, wild_letters, set_letters, bad_letters):
-	for letter_index in range(len(user_input)):
-		letter = user_input[letter_index]
-		if letter == "_":
-			bad_letters.append(tried_word[letter_index])
-		elif letter.isupper():
-			set_letters[letter_index] = letter
-		elif letter.islower():
-			wild_letters[letter_index] = letter
-		else:
-			raise ValueError("Invalid input")
-	return wild_letters, set_letters, bad_letters
-		
+def parse_results(green_user_input, yellow_user_input, gray_user_input, set_letters, wild_letters,  bad_letters):
+	for letter_pos in range(len(green_user_input)):
+		letter = green_user_input[letter_pos]
+		if letter is not "_":
+			set_letters[letter_pos] = letter
+
+	for letter_pos in range(len(yellow_user_input)):
+		letter = yellow_user_input[letter_pos]
+		if letter is not "_":
+			if wild_letters[letter] is None:
+				wild_letters[letter] = [letter_pos]
+			else:
+				wild_letters[letter].append(letter_pos)
+	
+	for letter_pos in range(len(gray_user_input)):
+		letter = gray_user_input[letter_pos]
+		if letter is not "_":
+			bad_letters.append(letter)
+
+	return set_letters, wild_letters, bad_letters
+	
+
 	
 
 
@@ -80,15 +93,16 @@ if __name__ == '__main__':
 	set_letters = {}
 	bad_letters = []
 
-	tried_word = find_best_choice(letters_in_position, words, wild_letters, set_letters, bad_letters)
+	tried_word = find_best_choice(letters_in_position, words, set_letters, wild_letters, bad_letters)
 	print(tried_word)
-	print("Enter letters that are in the correct position in capital letters, letters that are in the wrong position in lowercase letters, and incorrect with a '_'")
+	print("Use _ as spaces")
 	for i in range(len(words[0]) + 1): 
 		# Get user input
-		user_input = input('Enter results: ')
-		print(user_input)
-		wild_letters, set_letters, bad_letters = parse_results(user_input, tried_word, wild_letters, set_letters, bad_letters)
-		tried_word = find_best_choice(letters_in_position, words, wild_letters, set_letters, bad_letters)
+		green_user_input = input('Enter Green letters: ')
+		yellow_user_input = input('Enter Yellow letters: ')
+		gray_user_input = input('Enter Gray letters: ')
+		set_letters, wild_letters,  bad_letters = parse_results(green_user_input, yellow_user_input, gray_user_input, set_letters, wild_letters, bad_letters)
+		tried_word = find_best_choice(letters_in_position, words, set_letters, wild_letters, bad_letters)
 		print(tried_word)
 		
 		
