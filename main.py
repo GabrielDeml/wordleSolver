@@ -5,27 +5,25 @@ import copy
 
 def check_if_word_is_possable(word, set_letters, wild_letters, bad_letters):
 	# Get the number of unique letters in wild_letters dict
-	unknown_letters = len(word) - len(set(wild_letters.values())) - len(set_letters)
-	wild_letters = copy.deepcopy(wild_letters)
+	unknown_letters = len(word) - len(wild_letters) - len(set_letters)
 	set_letters = copy.deepcopy(set_letters)
+	wild_letters = copy.deepcopy(wild_letters)
+	
 
 	# Check if the word is possable
 	for letter_pos in range(len(word)):
 		letter = word[letter_pos]
 		if letter in bad_letters:
 			return False
-		if letter_pos in set_letters.values() or letter in wild_letters.values():
-			if letter_pos in set_letters and letter != set_letters[letter_pos]:
+		if letter in set_letters.values() or letter in wild_letters.keys():
+			if letter_pos in set_letters.keys() and letter != set_letters[letter_pos]:
 				return False
-		
-			if letter_pos in wild_letters:
-				if wild_letters[letter_pos] == letter:
-					return False
 			else:
-				# Get key of the letter
-				for key in wild_letters.keys():
-					if wild_letters[key] == letter:
-						wild_letters[key] == "*"
+				for letter_pos_tmp in wild_letters[letter]:
+					if letter_pos == letter_pos_tmp:
+						return False
+				else:
+					unknown_letters -= 1
 		else:
 			unknown_letters -= 1
 			if unknown_letters < 0:
@@ -48,29 +46,28 @@ def find_best_choice(letters_in_position, words, set_letters, wild_letters, bad_
 				max_word = word
 	return max_word
 
+
 def parse_results(green_user_input, yellow_user_input, gray_user_input, set_letters, wild_letters,  bad_letters):
 	for letter_pos in range(len(green_user_input)):
 		letter = green_user_input[letter_pos]
-		if letter is not "_":
+		if letter != "_":
 			set_letters[letter_pos] = letter
 
 	for letter_pos in range(len(yellow_user_input)):
 		letter = yellow_user_input[letter_pos]
-		if letter is not "_":
-			if wild_letters[letter] is None:
-				wild_letters[letter] = [letter_pos]
-			else:
+		if letter != "_":
+			if letter in wild_letters:
 				wild_letters[letter].append(letter_pos)
+			else:
+				wild_letters[letter] = [letter_pos]
+
 	
 	for letter_pos in range(len(gray_user_input)):
 		letter = gray_user_input[letter_pos]
-		if letter is not "_":
+		if letter != "_":
 			bad_letters.append(letter)
 
 	return set_letters, wild_letters, bad_letters
-	
-
-	
 
 
 if __name__ == '__main__':
