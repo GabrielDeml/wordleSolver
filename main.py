@@ -13,16 +13,15 @@ def check_if_word_is_possable(word, set_letters, wild_letters, bad_letters):
 	# Check if the word is possable
 	for letter_pos in range(len(word)):
 		letter = word[letter_pos]
-		if letter in bad_letters:
-			return False
-		elif letter_pos in set_letters.keys() and letter != set_letters[letter_pos]:
+
+		if letter_pos in set_letters.keys() and letter != set_letters[letter_pos]:
 				return False
 		elif letter in wild_letters.keys():
 			for letter_pos_tmp in wild_letters[letter]:
 				if letter_pos == letter_pos_tmp:
 					return False
-				# else:
-				# 	unknown_letters -= 1
+		elif letter in bad_letters:
+			return False
 		else:
 			unknown_letters -= 1
 			if unknown_letters < 0:
