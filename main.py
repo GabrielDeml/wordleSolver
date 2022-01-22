@@ -32,19 +32,31 @@ def check_if_word_is_possable(word, set_letters, wild_letters, bad_letters):
 
 
 def find_best_choice(letters_in_position, words, set_letters, wild_letters, bad_letters):
+    max_score_duplicate = 0
+    max_word_duplicate = ''
     max_score = 0
     max_word = ''
 
     for word in words:
         if check_if_word_is_possable(word, set_letters, wild_letters, bad_letters):
             score = 0
+            duplicate_letters = {}
             for letter_pos in range(len(word)):
                 letter = word[letter_pos]
+                if letter in duplicate_letters:
+                    duplicate_letters[letter] += 1
+                else:
+                    duplicate_letters[letter] = 1
                 score += letters_in_position[letter_pos][letter]
-            if score > max_score:
-                max_score = score
-                max_word = word
-    return max_word
+            if max(duplicate_letters.values()) > 1:
+                if score > max_score_duplicate:
+                    max_score_duplicate = score
+                    max_word_duplicate = word
+            else:
+                if score > max_score:
+                    max_score = score
+                    max_word = word
+    return max_word, max_word_duplicate
 
 
 def parse_results(green_user_input, yellow_user_input, gray_user_input, set_letters, wild_letters,  bad_letters):
@@ -89,9 +101,10 @@ if __name__ == '__main__':
     set_letters = {}
     bad_letters = []
 
-    tried_word = find_best_choice(
+    tried_word, tried_word_duplicate = find_best_choice(
         letters_in_position, words, set_letters, wild_letters, bad_letters)
     print("Start word: " + tried_word)
+    print("Start word duplicate: " + tried_word_duplicate)
     print("Use _ as spaces")
     for i in range(len(words[0])):
         # Get user input
@@ -100,6 +113,7 @@ if __name__ == '__main__':
         gray_user_input = input('Enter Gray letters: ')
         set_letters, wild_letters,  bad_letters = parse_results(
             green_user_input, yellow_user_input, gray_user_input, set_letters, wild_letters, bad_letters)
-        tried_word = find_best_choice(
+        tried_word, tried_word_duplicate = find_best_choice(
             letters_in_position, words, set_letters, wild_letters, bad_letters)
         print("Next word: " + tried_word)
+        print("Next word duplicate: " + tried_word_duplicate)
