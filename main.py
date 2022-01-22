@@ -63,7 +63,11 @@ def find_best_choice(letters_in_position, letter_count, words, set_letters, wild
                 if score_global_letter_count > max_score_letter_count:
                     max_score_letter_count = score_global_letter_count
                     max_word_letter_count = word
-    return max_word, max_word_duplicate, max_word_letter_count
+
+    best_word = max_word_letter_count
+    if len(set_letters) + len(wild_letters) >= 3:
+        best_word = max_word
+    return max_word, max_word_duplicate, max_word_letter_count, best_word
 
 
 def parse_results(green_user_input, yellow_user_input, gray_user_input, set_letters, wild_letters,  bad_letters):
@@ -71,6 +75,7 @@ def parse_results(green_user_input, yellow_user_input, gray_user_input, set_lett
         letter = green_user_input[letter_pos]
         if letter != "_":
             set_letters[letter_pos] = letter
+
 
     for letter_pos in range(len(yellow_user_input)):
         letter = yellow_user_input[letter_pos]
@@ -113,11 +118,12 @@ if __name__ == '__main__':
     set_letters = {}
     bad_letters = []
 
-    tried_word, tried_word_duplicate, tried_word_letter_count = find_best_choice(
+    tried_word, tried_word_duplicate, tried_word_letter_count, best_word = find_best_choice(
         letters_in_position, letter_count, words, set_letters, wild_letters, bad_letters)
     print("Start word: " + tried_word)
     print("Start word duplicate: " + tried_word_duplicate)
     print("Start word global letter count: " + tried_word_letter_count)
+    print("Best word: " + best_word)
     print("Use _ as spaces")
     for i in range(len(words[0])):
         # Get user input
@@ -126,8 +132,9 @@ if __name__ == '__main__':
         gray_user_input = input('Enter Gray letters: ')
         set_letters, wild_letters,  bad_letters = parse_results(
             green_user_input, yellow_user_input, gray_user_input, set_letters, wild_letters, bad_letters)
-        tried_word, tried_word_duplicate, tried_word_letter_count = find_best_choice(
+        tried_word, tried_word_duplicate, tried_word_letter_count, best_word = find_best_choice(
             letters_in_position, letter_count, words, set_letters, wild_letters, bad_letters)
         print("Next word: " + tried_word)
         print("Next word duplicate: " + tried_word_duplicate)
         print("Next word global letter count: " + tried_word_letter_count)
+        print("Best word: " + best_word)
