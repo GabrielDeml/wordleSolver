@@ -65,7 +65,7 @@ def find_best_choice(letters_in_position, letter_count, words, set_letters, wild
                     max_word_letter_count = word
 
     best_word = max_word_letter_count
-    if len(set_letters) + len(wild_letters) >= 3:
+    if len(set_letters) >= 3:
         best_word = max_word_duplicate
     return max_word, max_word_duplicate, max_word_letter_count, best_word
 
